@@ -3,21 +3,43 @@ import axios from '../../axios-orders'
 import { connect } from "react-redux"
 
 const Home = (props) => {
+  const [formData, setFormData] = useState("")
   const [currentUserData, setCurrentUserData] = useState({})
   const [allUserData, setAllUserData] = useState({})
+  const [newPost, setNewPost] = useState(false)
+
+  const token = localStorage.getItem('token')
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    axios.get( `/orders.json?auth=${token}&orderBy="userId"&equalTo="${props.userId}"`)    
+    axios.get( `/messages.json?auth=${token}&orderBy="userId"&equalTo="${props.userId}"`)    
     .then(response => {
       setCurrentUserData(response.data)
     })
-    axios.get( `/orders.json?auth=${token}&orderBy="userId"`)    
+    axios.get( `/messages.json?auth=${token}&orderBy="userId"`)    
     .then(response => {
       setAllUserData(response.data)
     })
     
-  }, [props.userId])
+  }, [props.userId, token, newPost])
+
+  useEffect(() => {
+    console.log(`form data is ${formData}`)
+  }, [formData])
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const orderData = `{"post":"${formData}","userId":"${props.userId}"}`;
+    axios.post('/messages.json?auth=' + token, orderData)
+    .then(response => {
+      setNewPost(!newPost)
+      setFormData("")
+      console.log(response.data)
+    })
+    .catch(error => {
+      console.log(error)
+    });
+  }
 
   return (
     <div>
@@ -25,10 +47,20 @@ const Home = (props) => {
       <button onClick={()=> props.history.push("/logout")}>
         Log Out
       </button>
-      <h1>Data for Current User is:</h1>
+
+      <form onSubmit={(e)=> handleSubmit(e)}>
+        <label>
+          Name:
+          <input type="text" value={formData} onChange={(e) =>setFormData(e.target.value)} />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+
+      <h1>Posts for Current User is:</h1>
       <h2>{JSON.stringify(currentUserData)}</h2>
-      <h1>Data for All User is:</h1>
+      <h1>Posts for All User is:</h1>
       <h2>{JSON.stringify(allUserData)}</h2>
+
     </div>
   )
 }
