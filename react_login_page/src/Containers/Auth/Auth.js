@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Input from "../../Components/UI/Input/Input";
 import Button from "../../Components/UI/Button/Button";
 import classes from "./Auth.module.css";
@@ -144,7 +144,7 @@ const Auth = (props) => {
         {form}
         <Button btnType="Success">SUBMIT</Button>
       </form>
-      <Button 
+      <Button
         clicked={() => switchAuthHandler()}
         btnType="Danger">SWITCH TO {isSignup ? 'SIGN IN': 'SIGN UP'}</Button>
     </div>
